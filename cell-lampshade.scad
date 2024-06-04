@@ -21,6 +21,12 @@ socket_angle = 45;
 // Magnet dimensions [lenth, width, thickness]
 magnet = [19, 9, 1.7];
 
+// Number of screws to fix the socket to the ceiling
+screws = 4;
+
+// Diameter of the screw in mm
+screw_diameter = 5;
+
 //---------------------------- internal stuff below, change at your own risk ----------------------------//
 
 cell_angle = 360 / (cells_per_layer / 2); // Degrees by which each cell is rotated, relative to the last one of its type
@@ -36,7 +42,7 @@ cylinder_rotation = (cells_per_layer % 4 == 0) ?
         ((cells_per_layer % 4 == 2) ? 0 : -90);
 cylinder_height = cell_height * (layers - 1) + 0.5 * cell_height;
 
-inner_cylinder_radius = calculateSideRadius(radius - cell_depth);
+inner_cylinder_radius = calculateSideRadius(radius - cell_lump_depth);
 outer_cylinder_radius = calculateSideRadius(radius + cell_lump_depth + cell_depth);
 
 // Stuff for the slanted top where shade and socket come together
@@ -114,6 +120,19 @@ module placeMagnets() {
         }
 }
 
+module placeScrews() {
+    bholeradius = bholediameter / 2;
+    screw_radius = bholeradius + (inner_cylinder_radius - bholeradius) / 2;
+    rotation = 360 / screws;
+    for (i = [0:1:screws]) {
+        rotate([0, 0, rotation * i]) {
+            translate([screw_radius, 0, 0]) {
+                cylinder(r = screw_diameter / 2, h = height, $fn = 100);
+            }
+        }
+    }
+}
+
 module placeLayer(current_z) {
     for (i = [0:1:cells_per_layer]) {
         current_degree = ((360 / cells_per_layer) * i);
@@ -172,7 +191,7 @@ module socketForShade() {
     difference() {
         wholeShade();
         getNegative();
-        cylinder(h = height, d = bholediameter);
+        cylinder(h = height, d = bholediameter, $fn = 100);
     }
 }
 
@@ -180,6 +199,7 @@ module socketForShadeWithMagnets() {
     difference() {
         socketForShade();
         placeMagnets();
+        placeScrews();
     }
 }
 
