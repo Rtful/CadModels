@@ -1,5 +1,6 @@
 // Wheter the model should be the socket, the lampshade or the whole model
-modelType = 0; // 0=whole, 1=only shade, 2=only socket, 3=only socket with magnets
+// 0=shade&socket, 1=only shade, 2=only socket, 3=only socket with magnets
+modelType = 0; 
 
 radius = 100;// Approximate radius of lampshade body.
 height = 200;// Height of the lamp body
